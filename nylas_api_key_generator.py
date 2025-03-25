@@ -9,6 +9,7 @@ import os
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding, utils
 from dotenv import load_dotenv
+import requests
 
 # Load environment variables
 load_dotenv()
@@ -150,40 +151,39 @@ def delete_api_key(api_key_id, debug=False):
     return generate_signature(path, "delete", debug=debug)
 
 
-def format_curl_command(result, api_key_id=None):
-    """Format the result as a curl command for easy testing."""
+def make_http_request(result, api_key_id=None):
+    """Make an HTTP request using the requests library."""
     headers = result["headers"]
     req_info = result["request_info"]
     
-    method = req_info["method"].upper()
+    method = req_info["method"].lower()
     path = req_info["path"]
     
-    # Base URL - adjust as needed for production vs staging
+    # Base URL
     base_url = NYLAS_API_URL
-    
-    curl_cmd = f"curl --location"
-    
-    if method == "DELETE":
-        curl_cmd += " --request DELETE"
-    
-    curl_cmd += f" '{base_url}{path}'"
-    
-    # Add headers
-    for key, value in headers.items():
-        curl_cmd += f" \\\n--header '{key}: {value}'"
+    full_url = f"{base_url}{path}"
     
     # Add content-type for POST/PUT
-    if method in ["POST", "PUT"] and "payload" in req_info:
-        curl_cmd += " \\\n--header 'Content-Type: application/json'"
+    if method in ["post", "put"] and "payload" in req_info:
+        headers["Content-Type"] = "application/json"
+        payload = json.loads(req_info["payload"])
         
-        # Add payload
-        payload_json = req_info["payload"]
-        # Format the payload for better readability
-        payload_obj = json.loads(payload_json)
-        formatted_payload = json.dumps(payload_obj, indent=4)
-        curl_cmd += f" \\\n--data '{formatted_payload}'"
+        # Make the request
+        response = requests.request(
+            method=method,
+            url=full_url,
+            headers=headers,
+            json=payload
+        )
+    else:
+        # For GET, DELETE, etc.
+        response = requests.request(
+            method=method,
+            url=full_url,
+            headers=headers
+        )
     
-    return curl_cmd
+    return response
 
 
 def main():
@@ -215,26 +215,49 @@ def main():
     args = parser.parse_args()
     
     if args.command == "create":
-        result = create_api_key(args.name, args.expires, True)
+        result = create_api_key(args.name, args.expires, args.debug)
         if result:
             print("\n=== API Key Creation Headers ===")
             print(json.dumps(result["headers"], indent=2))
-            print("\n=== cURL Command ===")
-            print(format_curl_command(result))
+            
+            # Make the HTTP request
+            response = make_http_request(result)
+            print("\n=== API Response ===")
+            print(f"Status Code: {response.status_code}")
+            try:
+                print(json.dumps(response.json(), indent=2))
+            except:
+                print(response.text)
     
     elif args.command == "delete":
         result = delete_api_key(args.api_key_id, args.debug)
         if result:
             print("\n=== API Key Deletion Headers ===")
             print(json.dumps(result["headers"], indent=2))
-            print("\n=== cURL Command ===")
-            print(format_curl_command(result))
+            
+            # Make the HTTP request
+            response = make_http_request(result)
+            print("\n=== API Response ===")
+            print(f"Status Code: {response.status_code}")
+            try:
+                print(json.dumps(response.json(), indent=2))
+            except:
+                print(response.text)
     
     else:
         # Default behavior - create an API key with default values
         result = create_api_key("kiran-test-api-key", 100, args.debug)
         if result:
             print(json.dumps(result["request_info"], indent=2))
+            
+            # Make the HTTP request
+            response = make_http_request(result)
+            print("\n=== API Response ===")
+            print(f"Status Code: {response.status_code}")
+            try:
+                print(json.dumps(response.json(), indent=2))
+            except:
+                print(response.text)
 
 
 if __name__ == '__main__':
