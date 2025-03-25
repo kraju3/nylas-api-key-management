@@ -1,0 +1,8 @@
+.env
+nylas_env
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/python.iml
+/.idea/vcs.xml
