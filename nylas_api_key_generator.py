@@ -117,7 +117,7 @@ def generate_signature(path, method, payload=None, debug=False):
         "headers": {
             "X-Nylas-Signature": signature_b64,
             "X-Nylas-Nonce": nonce,
-            "X-Nylas-Timestamp": timestamp,
+            "X-Nylas-Timestamp": str(timestamp),
             "X-Nylas-Kid": PRIVATE_KEY_ID
         },
         "request_info": {
