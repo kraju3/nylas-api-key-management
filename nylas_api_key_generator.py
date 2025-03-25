@@ -151,6 +151,12 @@ def delete_api_key(api_key_id, debug=False):
     return generate_signature(path, "delete", debug=debug)
 
 
+def get_api_key(api_key_id, debug=False):
+    """Generate signature for retrieving an API key by ID."""
+    path = f"{BASE_PATH}/{api_key_id}"
+    return generate_signature(path, "get", debug=debug)
+
+
 def make_http_request(result, api_key_id=None):
     """Make an HTTP request using the requests library."""
     headers = result["headers"]
@@ -187,7 +193,7 @@ def make_http_request(result, api_key_id=None):
 
 
 def main():
-        # Check if required environment variables are set
+    # Check if required environment variables are set
     if not all([PRIVATE_KEY_BASE64, PRIVATE_KEY_ID, APP_ID]):
         print("Error: Required environment variables are not set.")
         print("Please set the following environment variables:")
@@ -204,12 +210,19 @@ def main():
     create_parser = subparsers.add_parser("create", help="Create a new API key")
     create_parser.add_argument("--name", default="test-api-key", help="Name for the API key")
     create_parser.add_argument("--expires", type=int, default=100, help="Expiration time in seconds")
+    create_parser.add_argument("--debug", action="store_true", help="Print debug information")
+    
+    # Get API key command
+    get_parser = subparsers.add_parser("get", help="Get an API key by ID")
+    get_parser.add_argument("api_key_id", help="ID of the API key to retrieve")
+    get_parser.add_argument("--debug", action="store_true", help="Print debug information")
     
     # Delete API key command
     delete_parser = subparsers.add_parser("delete", help="Delete an API key")
     delete_parser.add_argument("api_key_id", help="ID of the API key to delete")
+    delete_parser.add_argument("--debug", action="store_true", help="Print debug information")
     
-    # Debug flag
+    # For the default case (no subcommand)
     parser.add_argument("--debug", action="store_true", help="Print debug information")
     
     args = parser.parse_args()
@@ -218,6 +231,21 @@ def main():
         result = create_api_key(args.name, args.expires, args.debug)
         if result:
             print("\n=== API Key Creation Headers ===")
+            print(json.dumps(result["headers"], indent=2))
+            
+            # Make the HTTP request
+            response = make_http_request(result)
+            print("\n=== API Response ===")
+            print(f"Status Code: {response.status_code}")
+            try:
+                print(json.dumps(response.json(), indent=2))
+            except:
+                print(response.text)
+    
+    elif args.command == "get":
+        result = get_api_key(args.api_key_id, args.debug)
+        if result:
+            print("\n=== API Key Retrieval Headers ===")
             print(json.dumps(result["headers"], indent=2))
             
             # Make the HTTP request

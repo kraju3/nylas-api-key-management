@@ -10,7 +10,6 @@ This script provides a secure way to interact with the Nylas Admin API for creat
 - Creating canonical JSON representations
 - Signing requests with RSA private keys
 - Formatting proper authentication headers
-- Generating ready-to-use cURL commands
 - Making HTTP requests directly to the Nylas API
 
 ## Authentication Flow
@@ -82,6 +81,17 @@ This will:
 - Generate the necessary authentication headers
 - Make an HTTP request to the Nylas API
 - Return the API key details including the key ID and secret
+
+### Retrieve an existing API key
+
+```bash
+python nylas_api_key_generator.py get <api_key_id>
+```
+
+This will:
+- Generate the necessary authentication headers
+- Make an HTTP request to retrieve the specified API key
+- Return the response from the Nylas API Key response without the API secret
 
 ### Delete an existing API key
 
