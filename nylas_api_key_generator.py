@@ -156,6 +156,10 @@ def get_api_key(api_key_id, debug=False):
     path = f"{BASE_PATH}/{api_key_id}"
     return generate_signature(path, "get", debug=debug)
 
+def list_api_keys(debug=False):
+    """Generate signature for retrieving API Keys."""
+    return generate_signature(BASE_PATH,"get",debug=debug)
+
 
 def make_http_request(result, api_key_id=None):
     """Make an HTTP request using the requests library."""
@@ -216,6 +220,10 @@ def main():
     get_parser = subparsers.add_parser("get", help="Get an API key by ID")
     get_parser.add_argument("api_key_id", help="ID of the API key to retrieve")
     get_parser.add_argument("--debug", action="store_true", help="Print debug information")
+
+    # List API keys command
+    list_parser = subparsers.add_parser("list", help="Get an API key by ID")
+    list_parser.add_argument("--debug", action="store_true", help="Print debug information")
     
     # Delete API key command
     delete_parser = subparsers.add_parser("delete", help="Delete an API key")
@@ -256,6 +264,21 @@ def main():
                 print(json.dumps(response.json(), indent=2))
             except:
                 print(response.text)
+
+    elif args.command == "list":
+        result = list_api_keys(args.debug)
+        if result:
+            print("\n=== API Key List Headers ===")
+            print(json.dumps(result["headers"], indent=2))
+
+            # Make the HTTP request
+            response = make_http_request(result)
+            print("\n=== API Response ===")
+            print(f"Status Code: {response.status_code}")
+            try:
+                print(json.dumps(response.json(), indent=2))
+            except:
+                print(response.text)
     
     elif args.command == "delete":
         result = delete_api_key(args.api_key_id, args.debug)
@@ -274,7 +297,7 @@ def main():
     
     else:
         # Default behavior - create an API key with default values
-        result = create_api_key("kiran-test-api-key", 100, args.debug)
+        result = create_api_key("test-api-key", 100, args.debug)
         if result:
             print(json.dumps(result["request_info"], indent=2))
             

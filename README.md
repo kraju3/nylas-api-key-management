@@ -42,6 +42,53 @@ The authentication uses RSA-based request signing:
    - X-Nylas-Timestamp: Current timestamp to ensure request freshness
    - X-Nylas-Kid: The private key ID to identify which key was used for signing
 
+
+## Endpoints
+
+### 1. Create an API Key
+
+```bash
+curl --location 'https://api.us.nylas.com/v3/admin/applications/{NYLAS_CLIENT_ID}/api-keys' \
+--header 'X-Nylas-Kid: {PRIVATE_KEY_ID}' \
+--header 'X-Nylas-Nonce: {NONCE}' \
+--header 'X-Nylas-Timestamp: {TIMESTAMP}' \
+--header 'X-Nylas-Signature: {BASE64_SIGNATURE}' \
+--header 'Content-Type: application/json' \
+--data '{
+    "expires_in": 120,
+    "name": "my-api-key"
+}'
+```
+
+**Sample Response**
+```json
+{
+  "id": "{{API_KEY_ID}}",
+  "name": "{{API_KEY_NAME}}",
+  "application_id": "{{NYLAS_CLIENT_ID}}",
+  "permissions": [
+    "all"
+  ],
+  "status": "active",
+  "expires_at": 1753300766,
+  "created_at": 1742932766,
+  "updated_at": 1742932766,
+  "api_key": "{{API_KEY_VALUE}}"
+}
+```
+
+---
+
+### 2. Delete an API Key
+
+```bash
+curl --location --globoff --request DELETE 'https://api.us.nylas.com/v3/admin/applications/{NYLAS_CLIENT_ID}/api-keys/{API_KEY_ID}' \
+--header 'X-Nylas-Kid: {PRIVATE_KEY_ID}' \
+--header 'X-Nylas-Nonce: {NONCE}' \
+--header 'X-Nylas-Timestamp: {TIMESTAMP}' \
+--header 'X-Nylas-Signature: {BASE64_SIGNATURE}'
+```
+
 ## Prerequisites
 
 - Python 3.6+
@@ -127,7 +174,7 @@ When successful, the API will return a JSON response with details about the crea
 {
    "id": "{{API_KEY_ID}}",
    "name": "{{API_KEY_NAME}},",
-   "application_id": "{{API_ID}}",
+   "application_id": "{{NYLAS_CLIENT_ID}}",
    "permissions": [
       "all"
    ],
