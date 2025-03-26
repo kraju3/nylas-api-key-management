@@ -195,3 +195,7 @@ When successful, the API will return a JSON response with details about the crea
 ## Error Handling
 
 The script will check for required environment variables and display appropriate error messages if they are missing.
+
+## API Key Rotation
+
+For best practices on securely rotating your API keys without service disruption, see our [API Key Rotation Strategy](./Rotation_Strategy.md).
