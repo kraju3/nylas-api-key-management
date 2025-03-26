@@ -12,6 +12,12 @@ This script provides a secure way to interact with the Nylas Admin API for creat
 - Formatting proper authentication headers
 - Making HTTP requests directly to the Nylas API
 
+## Flow Diagram
+
+This diagram illustrates how API keys are created and managed through service accounts tied to Nylas applications.
+
+![Nylas API Key Management Flow Diagram](./diagram.png)
+
 ## Authentication Flow
 
 1. **Service Account Provisioning**: 
