@@ -130,6 +130,10 @@ The script can be used to create or delete API keys:
 python nylas_api_key_generator.py create --name "my-api-key" --expires 3600
 ```
 
+**Important Parameters:**
+- `--name`: Must be a unique name for the API key
+- `--expires`: Number of days until the key expires
+
 This will:
 - Generate the necessary authentication headers
 - Make an HTTP request to the Nylas API
@@ -156,6 +160,31 @@ This will:
 - Generate the necessary authentication headers
 - Make an HTTP request to delete the specified API key
 - Return the response from the Nylas API
+
+### Rotate an API key
+
+```bash
+python nylas_api_key_generator.py rotate <old_key_id> --name "new-key-name" --expires 7776000
+```
+
+**Important Parameters:**
+- `--name`: Must be a unique name for the new API key
+- `--expires`: Number of days until the new key expires (default: 90 days)
+
+This will:
+- Create a new API key with the specified name and expiration
+- Return both the old key ID and the new key details
+- The old key remains active until you complete the rotation
+
+### Complete an API key rotation
+
+```bash
+python nylas_api_key_generator.py complete-rotation <old_key_id>
+```
+
+This will:
+- Delete the old API key after you've updated your applications to use the new key
+- Return a success message confirming the deletion
 
 ### Debug mode
 
