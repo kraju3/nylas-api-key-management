@@ -108,7 +108,7 @@ curl --location --globoff --request DELETE 'https://api.us.nylas.com/v3/admin/ap
 1. Clone this repository or download the script
 2. Install required dependencies: 
    ```
-   pip install cryptography python-dotenv requests
+   pip install -r requirements.txt
    ```
 3. Create a `.env` file based on the provided `.env.example`:
    ```
